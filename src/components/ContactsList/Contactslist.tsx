@@ -3,10 +3,18 @@ import { Container, StyledSearchIcon } from './Contactslist.styled';
 import { IContactsListProps, IContact } from '../../interfaces';
 import shortid from 'shortid';
 import { setFilter } from '../../redux/slices/filterSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Contact } from '../Contact/Contact';
 
+import {
+  getContactsSelector,
+  getIsLoading,
+  getLoadingStatus,
+} from '../../redux/slices/contactsSlice';
+
 export const ContactsList = ({ contacts }: IContactsListProps) => {
+  const storedContacts = useSelector(getContactsSelector);
+
   const formId = shortid.generate();
 
   const dispatch = useDispatch();
@@ -36,8 +44,8 @@ export const ContactsList = ({ contacts }: IContactsListProps) => {
       </div>
 
       <ul>
-        {contacts.map(({ name, number, id }: IContact) => (
-          <Contact name={name} number={number} id={id} key={id} />
+        {storedContacts.map(({ name, phone, id }: IContact) => (
+          <Contact name={name} number={phone} id={id} key={id} />
         ))}
       </ul>
     </Container>

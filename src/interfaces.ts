@@ -37,10 +37,7 @@ export interface IContact {
 export interface ContactsState extends Array<IContact> {}
 
 export interface IContactsInitial {
-  contacts: {
-    items: ContactsState;
-    isLoading: boolean;
-    error: null | string;
-  };
-  filter: string;
+  items: ContactsState;
+  isLoading: boolean;
+  error: null | string;
 }
