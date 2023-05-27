@@ -1,37 +1,80 @@
-import { createSlice } from '@reduxjs/toolkit';
-import shortid from 'shortid';
-import { IContact } from '../../interfaces';
-import { PayloadAction } from '@reduxjs/toolkit/dist/createAction';
-import { IState } from '../../interfaces';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { IContactsState, IContact, IFullState } from '../../interfaces';
+
+import { fetchContacts, removeContact, addContact } from '../operations';
+
+const initialState: IContactsState = {
+  items: [] as IContact[],
+  isLoading: false,
+  error: null,
+};
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: [] as IContact[],
-  reducers: {
-    addContact: {
-      reducer: (state, action: PayloadAction<IContact>) => {
-        state.unshift(action.payload);
-      },
-      prepare: (name: string, phone: string) => {
-        return {
-          payload: {
-            id: shortid(),
-            name: name,
-            phone: phone,
-          },
-        };
-      },
-    },
-    deleteContact: (state, action: PayloadAction<string>) => {
-      const contactId = action.payload;
-      const newState = state.filter(item => item.id !== contactId);
-      return newState;
-    },
+  initialState: initialState,
+  reducers: {},
+  extraReducers: builder => {
+    //fetchContacts
+    builder.addCase(fetchContacts.pending, (state: IContactsState, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(
+      fetchContacts.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.items = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      }
+    );
+    builder.addCase(
+      fetchContacts.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      }
+    );
+    //addContact
+    builder.addCase(addContact.pending, (state: IContactsState, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(addContact.fulfilled, (state, action) => {
+      state.items.push(action.payload);
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(addContact.rejected, (state, action) => {
+      state.isLoading = false;
+
+      ///TODO: error occures without type guard :
+      // Type 'unknown' is not assignable to type 'string | null'.ts(2322)
+
+      if (typeof action.payload === 'string') {
+        state.error = action.payload;
+      } else {
+        state.error = 'Unexpected error occured';
+      }
+    });
+    //removeContact
+    builder.addCase(removeContact.pending, (state: IContactsState, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(removeContact.fulfilled, (state, action) => {
+      state.items = state.items.filter(item => item.id !== action.payload.id);
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(removeContact.rejected, (state, action) => {
+      state.isLoading = false;
+      if (typeof action.payload === 'string') {
+        state.error = action.payload;
+      } else {
+        state.error = 'Unexpected error occured';
+      }
+    });
   },
 });
 
-export const { addContact, deleteContact } = contactsSlice.actions;
-
 export const contactsReducer = contactsSlice.reducer;
 
-export const getContacts = (state: IState) => state.contacts;
+export const getContacts = (state: IFullState) => state.contacts.items;

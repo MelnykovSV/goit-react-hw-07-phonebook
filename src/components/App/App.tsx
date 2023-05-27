@@ -1,36 +1,30 @@
 import React, { useEffect } from 'react';
 import { Form } from '../Form/Form';
 import { ContactsList } from '../ContactsList/Contactslist';
-
 import { ModernNormalize } from 'emotion-modern-normalize';
 import { Filter } from '../Filter/Filter';
-
 import { Container } from './App.styled';
 import { IContact } from '../../interfaces';
-
 import { ToastContainer, toast } from 'react-toastify';
-
 import { useSelector, useDispatch } from 'react-redux';
-
 import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
+import { getContacts } from '../../redux/slices/contactsSlice';
 import {
+  fetchContacts,
   addContact,
-  deleteContact,
-  getContacts,
-} from '../../redux/slices/contactsSlice';
+  removeContact,
+} from '../../redux/operations';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const App = () => {
-  ///Gets initial contacts value from local storage
   const dispatch = useDispatch();
   const filter = useSelector(getFilter);
   const contacts = useSelector(getContacts);
 
-  /// Saves contacts to local storage on its change
-
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+    ///TODO: FIX THOSE DISPATCH<ANY>!!!
+    dispatch<any>(fetchContacts());
+  }, [dispatch]);
 
   ///Saves contact to contacts if there is no contact with such name
   const formSubmitHandler = (data: IContact): boolean => {
@@ -40,7 +34,7 @@ export const App = () => {
         (item: IContact) => item.name.toLowerCase() === normalizedName
       )
     ) {
-      dispatch(addContact(data.name, data.phone));
+      dispatch<any>(addContact({ name: data.name, phone: data.phone }));
       return true;
     } else {
       toast(`${data.name} is already in contacts.`);
@@ -51,7 +45,7 @@ export const App = () => {
 
   ///Deletes contact
   const contactDeleteHandler = (id: string): void => {
-    dispatch(deleteContact(id));
+    dispatch<any>(removeContact(id));
   };
 
   /// Sets contacts filter

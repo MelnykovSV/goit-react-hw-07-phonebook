@@ -34,3 +34,19 @@ export interface IAddContactAction {}
 // export interface IStore {
 
 // }
+
+export interface IContactsState {
+  items: IContact[];
+  isLoading: boolean;
+  error: null | string;
+}
+
+export interface IContactPostData {
+  name: string;
+  phone: string;
+}
+
+export interface IFullState {
+  contacts: IContactsState;
+  filter: string;
+}
