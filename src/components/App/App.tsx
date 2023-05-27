@@ -8,7 +8,11 @@ import { IContact } from '../../interfaces';
 import { ToastContainer, toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
-import { getContacts } from '../../redux/slices/contactsSlice';
+import {
+  getContacts,
+  getIsLoading,
+  getError,
+} from '../../redux/slices/contactsSlice';
 import {
   fetchContacts,
   addContact,
@@ -20,7 +24,8 @@ export const App = () => {
   const dispatch = useDispatch();
   const filter = useSelector(getFilter);
   const contacts = useSelector(getContacts);
-
+  const isLoading = useSelector(getIsLoading);
+  const error = useSelector(getError);
   useEffect(() => {
     ///TODO: FIX THOSE DISPATCH<ANY>!!!
     dispatch<any>(fetchContacts());
@@ -63,6 +68,7 @@ export const App = () => {
       <h2>Phonebook</h2>
 
       <Form formSubmit={formSubmitHandler}></Form>
+      {isLoading && !error && <b>Request in progress...</b>}
       <h2>Contacts</h2>
       <Filter contactsFilter={contactsFilter} />
       <ContactsList

@@ -78,3 +78,5 @@ const contactsSlice = createSlice({
 export const contactsReducer = contactsSlice.reducer;
 
 export const getContacts = (state: IFullState) => state.contacts.items;
+export const getIsLoading = (state: IFullState) => state.contacts.isLoading;
+export const getError = (state: IFullState) => state.contacts.error;
