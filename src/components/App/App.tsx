@@ -6,7 +6,6 @@ import { Filter } from '../Filter/Filter';
 import { Container } from './App.styled';
 import { IContact } from '../../interfaces';
 import { ToastContainer, toast } from 'react-toastify';
-import { useSelector, useDispatch } from 'react-redux';
 import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
 import {
   getContacts,
@@ -20,15 +19,17 @@ import {
 } from '../../redux/operations';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+
 export const App = () => {
-  const dispatch = useDispatch();
-  const filter = useSelector(getFilter);
-  const contacts = useSelector(getContacts);
-  const isLoading = useSelector(getIsLoading);
-  const error = useSelector(getError);
+  const dispatch = useAppDispatch();
+
+  const filter = useAppSelector(getFilter);
+  const contacts = useAppSelector(getContacts);
+  const isLoading = useAppSelector(getIsLoading);
+  const error = useAppSelector(getError);
   useEffect(() => {
-    ///TODO: FIX THOSE DISPATCH<ANY>!!!
-    dispatch<any>(fetchContacts());
+    dispatch(fetchContacts());
   }, [dispatch]);
 
   ///Saves contact to contacts if there is no contact with such name
@@ -39,7 +40,7 @@ export const App = () => {
         (item: IContact) => item.name.toLowerCase() === normalizedName
       )
     ) {
-      dispatch<any>(addContact({ name: data.name, phone: data.phone }));
+      dispatch(addContact({ name: data.name, phone: data.phone }));
       return true;
     } else {
       toast(`${data.name} is already in contacts.`);
@@ -50,7 +51,7 @@ export const App = () => {
 
   ///Deletes contact
   const contactDeleteHandler = (id: string): void => {
-    dispatch<any>(removeContact(id));
+    dispatch(removeContact(id));
   };
 
   /// Sets contacts filter

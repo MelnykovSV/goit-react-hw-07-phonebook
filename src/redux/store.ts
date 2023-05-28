@@ -2,8 +2,6 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { contactsReducer } from './slices/contactsSlice';
 import { filterReducer } from './slices/filterSlice';
 
-import thunkMiddleware from 'redux-thunk';
-
 const rootReducer = combineReducers({
   contacts: contactsReducer,
   filter: filterReducer,
@@ -11,5 +9,8 @@ const rootReducer = combineReducers({
 
 export const store = configureStore({
   reducer: rootReducer,
-  middleware: [thunkMiddleware],
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;

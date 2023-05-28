@@ -16,61 +16,53 @@ const contactsSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     //fetchContacts
-    builder.addCase(fetchContacts.pending, (state: IContactsState, action) => {
+    builder.addCase(fetchContacts.pending, (state: IContactsState) => {
       state.isLoading = true;
     });
     builder.addCase(
       fetchContacts.fulfilled,
-      (state, action: PayloadAction<any>) => {
+      (state, action: PayloadAction<IContact[]>) => {
         state.items = action.payload;
         state.isLoading = false;
         state.error = null;
       }
     );
+    builder.addCase(fetchContacts.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Something went wrong';
+    });
+    //addContact
+    builder.addCase(addContact.pending, (state: IContactsState) => {
+      state.isLoading = true;
+    });
     builder.addCase(
-      fetchContacts.rejected,
-      (state, action: PayloadAction<any>) => {
+      addContact.fulfilled,
+      (state, action: PayloadAction<IContact>) => {
+        state.items.push(action.payload);
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = null;
       }
     );
-    //addContact
-    builder.addCase(addContact.pending, (state: IContactsState, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(addContact.fulfilled, (state, action) => {
-      state.items.push(action.payload);
-      state.isLoading = false;
-      state.error = null;
-    });
     builder.addCase(addContact.rejected, (state, action) => {
       state.isLoading = false;
-
-      ///TODO: error occures without type guard :
-      // Type 'unknown' is not assignable to type 'string | null'.ts(2322)
-
-      if (typeof action.payload === 'string') {
-        state.error = action.payload;
-      } else {
-        state.error = 'Unexpected error occured';
-      }
+      state.error = action.error.message || 'Something went wrong';
     });
     //removeContact
-    builder.addCase(removeContact.pending, (state: IContactsState, action) => {
+    builder.addCase(removeContact.pending, (state: IContactsState) => {
       state.isLoading = true;
     });
-    builder.addCase(removeContact.fulfilled, (state, action) => {
-      state.items = state.items.filter(item => item.id !== action.payload.id);
-      state.isLoading = false;
-      state.error = null;
-    });
+    builder.addCase(
+      removeContact.fulfilled,
+      (state, action: PayloadAction<string>) => {
+        ///Check this if something wrong!!!
+        state.items = state.items.filter(item => item.id !== action.payload);
+        state.isLoading = false;
+        state.error = null;
+      }
+    );
     builder.addCase(removeContact.rejected, (state, action) => {
       state.isLoading = false;
-      if (typeof action.payload === 'string') {
-        state.error = action.payload;
-      } else {
-        state.error = 'Unexpected error occured';
-      }
+      state.error = action.error.message || 'Something went wrong';
     });
   },
 });
