@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
 import { IContactsState, IContact, IFullState } from '../../interfaces';
-
 import { fetchContacts, removeContact, addContact } from '../operations';
 
 const initialState: IContactsState = {
