@@ -53,9 +53,8 @@ const contactsSlice = createSlice({
     });
     builder.addCase(
       removeContact.fulfilled,
-      (state, action: PayloadAction<string>) => {
-        ///Check this if something wrong!!!
-        state.items = state.items.filter(item => item.id !== action.payload);
+      (state, action: PayloadAction<IContact>) => {
+        state.items = state.items.filter(item => item.id !== action.payload.id);
         state.isLoading = false;
         state.error = null;
       }
