@@ -1,51 +1,82 @@
-import { useEffect } from 'react';
-// import { Form } from '../Form/Form';
+import React, { useEffect } from 'react';
+import { Form } from '../Form/Form';
 import { ContactsList } from '../ContactsList/Contactslist';
 import { ModernNormalize } from 'emotion-modern-normalize';
+import { Filter } from '../Filter/Filter';
 import { Container } from './App.styled';
 import { IContact } from '../../interfaces';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useSelector } from 'react-redux';
-
+import { ToastContainer, toast } from 'react-toastify';
+import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
 import {
-  getContactsSelector,
+  getContacts,
   getIsLoading,
-  getLoadingStatus,
+  getError,
 } from '../../redux/slices/contactsSlice';
+import {
+  fetchContacts,
+  addContact,
+  removeContact,
+} from '../../redux/operations';
+import 'react-toastify/dist/ReactToastify.css';
 
-import { getFilter } from '../../redux/slices/filterSlice';
-
-import { useDispatch } from 'react-redux';
-
-import axios from 'axios';
-
-import { fetchContacts, fetchContactsShort } from '../../redux/operations';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 export const App = () => {
-  const storedContacts = useSelector(getContactsSelector);
-  const isLoading = useSelector(getLoadingStatus);
-  const filter = useSelector(getFilter);
+  const dispatch = useAppDispatch();
 
-  const dispatch = useDispatch();
-
-  // const shownContacts = storedContacts.filter((item: IContact) => {
-  //   return item.name.includes(filter);
-  // });
-
+  const filter = useAppSelector(getFilter);
+  const contacts = useAppSelector(getContacts);
+  const isLoading = useAppSelector(getIsLoading);
+  const error = useAppSelector(getError);
   useEffect(() => {
-    dispatch(fetchContactsShort());
-  }, []);
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  ///Saves contact to contacts if there is no contact with such name
+  const formSubmitHandler = (data: IContact): boolean => {
+    const normalizedName = data.name.toLowerCase();
+    if (
+      !contacts.some(
+        (item: IContact) => item.name.toLowerCase() === normalizedName
+      )
+    ) {
+      dispatch(addContact({ name: data.name, phone: data.phone }));
+      return true;
+    } else {
+      toast(`${data.name} is already in contacts.`);
+
+      return false;
+    }
+  };
+
+  ///Deletes contact
+  const contactDeleteHandler = (id: string): void => {
+    dispatch(removeContact(id));
+  };
+
+  /// Sets contacts filter
+  const contactsFilter = (value: string): void => {
+    dispatch(updateFilter(value.toLowerCase()));
+  };
+
+  const filteredContacts = contacts.filter((item: IContact): boolean =>
+    item.name.toLowerCase().includes(filter)
+  );
 
   return (
     <Container>
       <ModernNormalize />
       <h2>Phonebook</h2>
-      {/* {<p>{JSON.stringify(isLoading)}</p>}
-      <div>{JSON.stringify(storedContacts)}</div> */}
 
-      {/* <Form /> */}
-      <ContactsList contacts={storedContacts} />
+      <Form formSubmit={formSubmitHandler}></Form>
+      {isLoading && !error && <b>Request in progress...</b>}
+      <h2>Contacts</h2>
+      <Filter contactsFilter={contactsFilter} />
+      <ContactsList
+        filteredContacts={filteredContacts}
+        contactDeleteHandler={contactDeleteHandler}
+      />
+
       <ToastContainer />
     </Container>
   );

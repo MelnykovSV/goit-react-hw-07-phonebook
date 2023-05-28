@@ -1,102 +1,79 @@
-import { PayloadAction, createSlice, current } from '@reduxjs/toolkit';
-import { IContact, ContactsState, IContactsInitial } from '../../interfaces';
-// import shortid from 'shortid';
-import { IState } from '../../interfaces';
-import { fetchContactsShort, removeContact } from '../operations';
-export const getContacts = (state: IState) => state.contacts;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IContactsState, IContact, IFullState } from '../../interfaces';
+import { fetchContacts, removeContact, addContact } from '../operations';
 
-const contactsInitialState: IContactsInitial = {
-  items: [],
+const initialState: IContactsState = {
+  items: [] as IContact[],
   isLoading: false,
   error: null,
 };
 
+// function handleRejected(
+//   state: IContactsState,
+//   action: { error: { message: string } }
+// ) {
+//   state.isLoading = false;
+//   state.error = action.error.message || 'Something went wrong';
+// }
+
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: contactsInitialState,
-  reducers: {
-    getContacts1(state) {
-      return state.items;
-    },
-    getIsLoading(state) {
-      return state.isLoading;
-    },
-    deleteContact(state, action) {
-      // state.items = state.items.filter(item => {
-      //   return item.id !== action.payload;
-      // });
-      const index = state.items.findIndex(task => {
-        return task.id === action.payload;
-      });
-      console.log(index);
-      state.items.splice(index, 1);
-
-      // return newState;
-    },
-
-    addContact(state, action) {
-      state.items = [
-        ...state.items,
-        { id: '123', name: 'unknown', phone: '123123123' },
-      ];
-    },
-    // // Виконається в момент старту HTTP-запиту
-    // fetchingInProgress(state) {
-    //   state.isLoading = true;
-    // },
-    // // Виконається якщо HTTP-запит завершився успішно
-    // fetchingSuccess(state, action) {
-    //   state.isLoading = false;
-    //   state.error = null;
-    //   state.items = action.payload;
-    // },
-    // // Виконається якщо HTTP-запит завершився з помилкою
-    // fetchingError(state, action) {
-    //   state.isLoading = false;
-    //   state.error = action.payload;
-    // },
-  },
-  extraReducers: {
-    [fetchContactsShort.pending](state, action) {
+  initialState: initialState,
+  reducers: {},
+  extraReducers: builder => {
+    //fetchContacts
+    builder.addCase(fetchContacts.pending, (state: IContactsState) => {
       state.isLoading = true;
-    },
-    [fetchContactsShort.fulfilled](state, action) {
+    });
+    builder.addCase(
+      fetchContacts.fulfilled,
+      (state, action: PayloadAction<IContact[]>) => {
+        state.items = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      }
+    );
+    builder.addCase(fetchContacts.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = null;
-      state.items = action.payload;
-    },
-    [fetchContactsShort.rejected](state, action) {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-
-    [removeContact.pending](state, action) {
+      state.error = action.error.message || 'Something went wrong';
+    });
+    //addContact
+    builder.addCase(addContact.pending, (state: IContactsState) => {
       state.isLoading = true;
-    },
-    [removeContact.fulfilled](state, action) {
+    });
+    builder.addCase(
+      addContact.fulfilled,
+      (state, action: PayloadAction<IContact>) => {
+        state.items.push(action.payload);
+        state.isLoading = false;
+        state.error = null;
+      }
+    );
+    builder.addCase(addContact.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = null;
-      const index = state.items.findIndex(
-        task => task.id === action.payload.id
-      );
-      state.items.splice(index, 1);
-    },
-    [removeContact.rejected](state, action) {
+      state.error = action.error.message || 'Something went wrong';
+    });
+    //removeContact
+    builder.addCase(removeContact.pending, (state: IContactsState) => {
+      state.isLoading = true;
+    });
+    builder.addCase(
+      removeContact.fulfilled,
+      (state, action: PayloadAction<IContact>) => {
+        state.items = state.items.filter(item => item.id !== action.payload.id);
+        state.isLoading = false;
+        state.error = null;
+      }
+    );
+    builder.addCase(removeContact.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.payload;
-    },
+      state.error = action.error.message || 'Something went wrong';
+    });
   },
 });
 
 export const contactsReducer = contactsSlice.reducer;
-// export const {
-//   fetchingInProgress,
-//   fetchingSuccess,
-//   fetchingError,
-//   getIsLoading,
-//   getContacts1,
-//   deleteContact,
-//   addContact,
-// } = contactsSlice.actions;
-export const getContactsSelector = state => state.contacts.items;
-export const getLoadingStatus = state => state.contacts.isLoading;
+
+export const getContacts = (state: IFullState) => state.contacts.items;
+export const getIsLoading = (state: IFullState) => state.contacts.isLoading;
+export const getError = (state: IFullState) => state.contacts.error;
