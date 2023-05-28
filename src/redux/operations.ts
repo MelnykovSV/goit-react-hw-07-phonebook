@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { IContactPostData } from '../interfaces';
 import { IContact } from '../interfaces';
