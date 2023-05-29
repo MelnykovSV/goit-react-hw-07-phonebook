@@ -36,7 +36,7 @@ export const Form = ({ formSubmit }: IFormProps) => {
     const isValid = await schema.isValid(values);
 
     if (isValid) {
-      const result = { ...values, id: shortid.generate() };
+      const result = { ...values };
 
       const isSuccessfull = formSubmit(result);
 

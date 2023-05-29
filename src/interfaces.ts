@@ -16,13 +16,18 @@ export interface IContactsListProps {
 }
 
 export interface IFormProps {
-  formSubmit: (data: IContact) => boolean;
+  formSubmit: (data: IContactData) => boolean;
 }
 
 export interface IContact {
   name: string;
   phone: string;
   id: string;
+}
+
+export interface IContactData {
+  name: string;
+  phone: string;
 }
 
 export interface IFilterProps {

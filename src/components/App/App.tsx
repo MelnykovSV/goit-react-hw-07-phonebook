@@ -5,7 +5,7 @@ import { ModernNormalize } from 'emotion-modern-normalize';
 import { Filter } from '../Filter/Filter';
 import { StatusIndicator } from '../StatusIndicator/StatusIndicator';
 import { Container } from './App.styled';
-import { IContact } from '../../interfaces';
+import { IContact, IContactData } from '../../interfaces';
 import { ToastContainer, toast } from 'react-toastify';
 import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
 import { getContacts } from '../../redux/slices/contactsSlice';
@@ -28,7 +28,7 @@ export const App = () => {
   }, [dispatch]);
 
   ///Saves contact to contacts if there is no contact with such name
-  const formSubmitHandler = (data: IContact): boolean => {
+  const formSubmitHandler = (data: IContactData): boolean => {
     const normalizedName = data.name.toLowerCase();
     if (
       !contacts.some(
