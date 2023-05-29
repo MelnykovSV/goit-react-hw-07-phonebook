@@ -3,7 +3,6 @@ import { Container } from './Form.styled';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { IFormProps } from '../../interfaces';
-import shortid from 'shortid';
 
 export const Form = ({ formSubmit }: IFormProps) => {
   const schema = yup.object().shape({
