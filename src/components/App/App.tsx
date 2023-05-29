@@ -3,15 +3,12 @@ import { Form } from '../Form/Form';
 import { ContactsList } from '../ContactsList/Contactslist';
 import { ModernNormalize } from 'emotion-modern-normalize';
 import { Filter } from '../Filter/Filter';
+import { StatusIndicator } from '../StatusIndicator/StatusIndicator';
 import { Container } from './App.styled';
 import { IContact } from '../../interfaces';
 import { ToastContainer, toast } from 'react-toastify';
 import { updateFilter, getFilter } from '../../redux/slices/filterSlice';
-import {
-  getContacts,
-  getIsLoading,
-  getError,
-} from '../../redux/slices/contactsSlice';
+import { getContacts } from '../../redux/slices/contactsSlice';
 import {
   fetchContacts,
   addContact,
@@ -26,8 +23,6 @@ export const App = () => {
 
   const filter = useAppSelector(getFilter);
   const contacts = useAppSelector(getContacts);
-  const isLoading = useAppSelector(getIsLoading);
-  const error = useAppSelector(getError);
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
@@ -69,7 +64,7 @@ export const App = () => {
       <h2>Phonebook</h2>
 
       <Form formSubmit={formSubmitHandler}></Form>
-      {isLoading && !error && <b>Request in progress...</b>}
+      <StatusIndicator />
       <h2>Contacts</h2>
       <Filter contactsFilter={contactsFilter} />
       <ContactsList
