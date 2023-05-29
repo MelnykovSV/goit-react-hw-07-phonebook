@@ -8,14 +8,6 @@ const initialState: IContactsState = {
   error: null,
 };
 
-// function handleRejected(
-//   state: IContactsState,
-//   action: { error: { message: string } }
-// ) {
-//   state.isLoading = false;
-//   state.error = action.error.message || 'Something went wrong';
-// }
-
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState: initialState,
